@@ -1,6 +1,10 @@
-from django.shortcuts import render
+from typing import Union
 
-posts = [
+from django.shortcuts import render
+from django.http import Http404
+
+
+posts: list[dict[str, Union[int, str]]] = [
     {
         'id': 0,
         'location': 'Остров отчаянья',
@@ -43,16 +47,24 @@ posts = [
     },
 ]
 
-def index(request):
-    return render(request, 'index.html', {'posts': posts})
+main_posts = {post['id']: post for post in posts}
 
-def post_detail(request, id):
-    post = next((post for post in posts if post['id'] == id), None)
-    if post:
-        return render(request, 'detail.html', {'post': post})
-    else:
-        return render(request, 'detail.html', {'post': None}) # или можно 404
+
+def index(request):
+    template_name = 'blog/index.html'
+    context = {'posts': posts[::-1]}
+    return render(request, template_name, context)
+
+
+def post_detail(request, post_id):
+    template_name = 'blog/detail.html'
+    if post_id not in main_posts:
+        raise Http404('Страница не найдена!')
+    context = {'post': main_posts[post_id]}
+    return render(request, template_name, context)
+
 
 def category_posts(request, category_slug):
-    category_posts_list = [post for post in posts if post['category'] == category_slug]
-    return render(request, 'category.html', {'category_posts': category_posts_list, 'category_slug': category_slug})
+    template_name = 'blog/category.html'
+    context = {'category': category_slug}
+    return render(request, template_name, context)
