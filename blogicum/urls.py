@@ -5,5 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('pages/', include('pages.urls')),
     path('blog/', include('blog.urls')),
-    path('', include('blog.urls')),
+    path('', include('blog.urls')),  # Главная страница blog
 ]
